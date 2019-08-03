@@ -1,0 +1,1 @@
+export const PLACE_BY_TEXT_SEARCH_GOOGLE_API = "https://maps.googleapis.com/maps/api/place/textsearch/json";
