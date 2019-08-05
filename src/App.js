@@ -10,6 +10,12 @@ import messages from './messages';
 
 import LoadableLoading from './common/LoadableLoading';
 
+const SearchMapLoader = Loadable({
+  loader: () => import('./components/SearchMap'),
+  loading: LoadableLoading,
+  delay: 50
+});
+
 const LocationMapLoader = Loadable({
   loader: () => import('./components/LocationMap'),
   loading: LoadableLoading,
@@ -22,7 +28,7 @@ function App(props) {
   return (
     <IntlProvider locale={lang} messages={messages[lang]}>
       <Switch>
-        <Route path="/" exact render={props => <LocationMapLoader {...props} />} />
+        <Route path="/" exact render={props => <SearchMapLoader {...props} />} />
       </Switch>
     </IntlProvider>
   );

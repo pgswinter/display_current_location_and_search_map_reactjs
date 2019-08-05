@@ -7,10 +7,14 @@ import { requestLocationMap } from '../../actions/LocationMap/LocationMapActions
 import { requestSearchMap } from '../../actions/SearchMap/SearchMapActions';
 
 const AnyReactComponent = ({ text }) => <div>{text}</div>;
-
+const google = window.google ? window.google : {};
 class LocationMap extends Component {
     constructor(props) {
         super(props);
+
+        this.googleMap = React.createRef();
+        this.autocompleteInput = React.createRef();
+
         this.state = {
             centerState: {
                 lat: '',
@@ -23,6 +27,13 @@ class LocationMap extends Component {
 
     componentDidMount() {
         this.props.requestLocationMap();
+        console.log(`location: `,this.props);
+        
+        this.googleMap = new google.maps.Map(this.googleMap.current, {
+            center: { lat: -33.8688, lng: 151.2195 },
+            zoom: 13
+        });
+        this.autocompleteInput = new google.maps.Map(this.autocompleteInput.current)
     }
 
     openSearchModal = (e) => {
@@ -73,38 +84,45 @@ class LocationMap extends Component {
 
         return (
             <React.Fragment>
-                {(!!results && isSearching) ?
-                    <div>
-                        <input type="text" onChange={(e) => { this.handleQuerySearchMap(e) }} />
-                        <ul>
-                            {results.map(item => <li onClick={() => { this.handleRenewLocation(item) }}>
-                                {item.formatted_address}
-                            </li>)}
-                        </ul>
-                    </div> :
-                    <div>
-                        <input type="text" onClick={(e) => { this.openSearchModal(e) }} />
-                        <div style={{ height: '50vh', width: '100vw' }}>
-                            <GoogleMapReact
-                                bootstrapURLKeys={{ key: apiKey }}
-                                defaultCenter={displayCenter}
-                                defaultZoom={zoom}
-                            >
-                                <AnyReactComponent
-                                    lat={displayLatitude}
-                                    lng={displayLongitude}
-                                    text="My Marker"
-                                />
-                            </GoogleMapReact>
+                <input type="text" ref={this.autocompleteInput} />
+                <div style={{height: '40vh'}} ref={this.googleMap}></div>
+                {/*
+                    {(!!results && isSearching) ?
+                        <div>
+                            <input type="text" onChange={(e) => { this.handleQuerySearchMap(e) }} />
+                            <ul>
+                                {results.map(item => <li onClick={() => { this.handleRenewLocation(item) }}>
+                                    {item.formatted_address}
+                                </li>)}
+                            </ul>
+                        </div> :
+                        <div>
+                            <input type="text" onClick={(e) => { this.openSearchModal(e) }} />
+                            <div style={{ height: '50vh', width: '100vw' }}>
+                                <GoogleMapReact
+                                    bootstrapURLKeys={{ key: apiKey }}
+                                    defaultCenter={displayCenter}
+                                    defaultZoom={zoom}
+                                >
+                                    <AnyReactComponent
+                                        lat={displayLatitude}
+                                        lng={displayLongitude}
+                                        text="My Marker"
+                                    />
+                                </GoogleMapReact>
+                            </div>
                         </div>
-                    </div>
-                }
+                    }
+                */}
+
             </React.Fragment>
         )
     }
 };
 
 const mapStateToProps = state => {
+    console.log(`state: `, state);
+
     const { location: { data }, searchMap } = state;
     return {
         data,
