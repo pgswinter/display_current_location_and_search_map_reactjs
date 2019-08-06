@@ -28,12 +28,57 @@ class CurrentLocation extends Component {
 
     initMap = () => {
         const { google, locationData } = this.props;
-        var map = new google.maps.Map(this.map.current, {
+        const map = new google.maps.Map(this.map.current, {
             center: { lat: locationData.latitude, lng: locationData.longitude },
             zoom: 13
         });
 
         map.controls[google.maps.ControlPosition.TOP_RIGHT].push(this.pacCard.current);
+        
+        // -----------------------------------------------------------------------------------------------------------------------
+        // *
+        // *
+        // * DETERMINNG CURRENT LOCATION
+        // *
+        // *
+        const geocoder = new google.maps.Geocoder();
+        const service = new google.maps.places.PlacesService(map);
+
+        geocoder.geocode({
+            'location': { lat: locationData.latitude, lng: locationData.longitude },
+        },
+            (results, status) => {
+                if (status === 'OK') {
+                    const request = {
+                        placeId: results[0].place_id,
+                        fields: ['name', 'formatted_address', 'place_id', 'geometry']
+                    };
+                    service.getDetails(request, (place, state) => {
+                        if (status === google.maps.places.PlacesServiceStatus.OK) {
+                            var marker = new google.maps.Marker({
+                                map: map,
+                                position: place.geometry.location
+                            });
+                            google.maps.event.addListener(marker, 'click', function () {
+                                infowindow.setContent('<div><strong>' + place.name + '</strong><br>' +
+                                    'Place ID: ' + place.place_id + '<br>' +
+                                    place.formatted_address + '</div>');
+                                infowindow.open(map, this);
+                            });
+                        }
+                    })
+                } else {
+                    window.alert('Geocoder failed due to: ' + status);
+                }
+            }
+        )
+
+        // -----------------------------------------------------------------------------------------------------------------------
+        // *
+        // *
+        // * SEARCH LOCATION BY ADDRESS
+        // *
+        // *
 
         var autocomplete = new google.maps.places.Autocomplete(this.pacInput.current);
 
@@ -50,9 +95,9 @@ class CurrentLocation extends Component {
         infowindow.setContent(this.infowindowContent.current);
         var marker = new google.maps.Marker({
             map: map,
-            anchorPoint: new google.maps.Point(0, -29)
+            anchorPoint: new google.maps.Point(0, -29),
         });
-        autocomplete.addListener('place_changed',  () => {
+        autocomplete.addListener('place_changed', () => {
             infowindow.close();
             marker.setVisible(false);
             var place = autocomplete.getPlace();
@@ -91,6 +136,12 @@ class CurrentLocation extends Component {
             infowindow.open(map, marker);
         });
 
+        // -----------------------------------------------------------------------------------------------------------------------
+        // *
+        // *
+        // * SEARCH LOCATION BY ADDRESS
+        // *
+        // *
         // Sets a listener on a radio button to change the filter type on Places
         // Autocomplete.
         const setupClickListener = (obj, types) => {
@@ -110,7 +161,7 @@ class CurrentLocation extends Component {
         //         autocomplete.setTypes(types);
         //     });
         // }
-        
+
         // setupClickListener('changetype-all', []);
         // setupClickListener('changetype-address', ['address']);
         // setupClickListener('changetype-establishment', ['establishment']);
@@ -122,7 +173,6 @@ class CurrentLocation extends Component {
         });
     }
 
-
     render() {
         return (
             <React.Fragment>
@@ -132,39 +182,39 @@ class CurrentLocation extends Component {
                     <input type="text" ref={this.autocompleteInput} />
                 */}
                 <div className="pac-card" ref={this.pacCard}>
-                    <div>
+                    <div className="pac-wrapper">
                         <div className="title">
                             Autocomplete search
                         </div>
-                        <div className="pac-controls">
-                            <input 
-                                type="radio" 
-                                name="type" 
+                        <div className="pac-controls select-search-type">
+                            <input
+                                type="radio"
+                                name="type"
                                 className="changetype-all"
-                                checked="checked" 
+                                checked="checked"
                                 ref={this.changetypeAll}
                             />
                             <label htmlFor="changetype-all">All</label>
 
-                            <input 
-                                type="radio" 
-                                name="type" 
+                            <input
+                                type="radio"
+                                name="type"
                                 className="changetype-establishment"
                                 ref={this.changetypeEstablishment}
                             />
                             <label htmlFor="changetype-establishment">Establishments</label>
 
-                            <input 
-                                type="radio" 
-                                name="type" 
-                                className="changetype-address" 
+                            <input
+                                type="radio"
+                                name="type"
+                                className="changetype-address"
                                 ref={this.changetypeAddress}
                             />
                             <label htmlFor="changetype-address">Addresses</label>
 
-                            <input 
-                                type="radio" 
-                                name="type" 
+                            <input
+                                type="radio"
+                                name="type"
                                 className="changetype-geocode"
                                 ref={this.changetypeGeocode}
                             />
@@ -182,11 +232,11 @@ class CurrentLocation extends Component {
                 </div>
                 <div style={{ height: '40vh' }} className="map" ref={this.map}></div>
                 <div className="infowindow-content" ref={this.infowindowContent}>
-                    <img 
+                    <img
                         src=""
-                        width="16" 
-                        height="16" 
-                        className="place-icon" 
+                        width="16"
+                        height="16"
+                        className="place-icon"
                         alt="_place_icon_thumb"
                         ref={this.placeIcon}
                     />
@@ -194,7 +244,7 @@ class CurrentLocation extends Component {
                         className="title"
                         ref={this.placeTitle}
                     ></span><br />
-                    <span 
+                    <span
                         className="place-address"
                         ref={this.placeAddress}
                     ></span>
