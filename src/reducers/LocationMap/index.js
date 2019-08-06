@@ -6,7 +6,7 @@ import {
 
 const initialState = {
     loading: false,
-    isRequest: false,
+    isRequested: false,
     data: {},
     error: '',
 }
@@ -17,20 +17,20 @@ export default function (state = initialState, action = {}) {
             return {
                 ...state,
                 loading: true,
-                isRequest: true,
+                isRequested: false,
             }
         case REQUEST_LOCATION_SUCCESS:
             return {
                 ...state,
                 loading: true,
-                isRequest: true,
+                isRequested: true,
                 data: action.payload,
             }
         case REQUEST_LOCATION_FAIL:
             return {
                 ...state,
                 loading: true,
-                isRequest: true,
+                isRequested: true,
                 error: 'Fail'
             }
         default:

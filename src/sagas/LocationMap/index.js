@@ -16,7 +16,6 @@ const detectLocation = () => new Promise((resolve, reject) => {
 function* requestLocationMap() {
     try {
         const payload = yield call(detectLocation);
-        debugger
         yield put({ type: REQUEST_LOCATION_SUCCESS, payload });
     } catch (error) {
         yield put({ type: REQUEST_LOCATION_FAIL, error });
