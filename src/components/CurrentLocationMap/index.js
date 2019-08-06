@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 
+import './style.css';
+
 class CurrentLocation extends Component {
     constructor(props) {
         super(props);
